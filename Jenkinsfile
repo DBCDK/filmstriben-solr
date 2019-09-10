@@ -14,7 +14,7 @@ pipeline {
 		stage("docker build model") {
 			steps {
 				script {
-					image = docker.build("docker-xp.dbc.dk/filmstriben-solr:${DOCKER_TAG}")
+					image = docker.build("docker-xp.dbc.dk/filmstriben-solr:${DOCKER_TAG}", "--no-cache .")
 					image.push()
 					if(env.BRANCH_NAME == "master") {
 						image.push("latest")
