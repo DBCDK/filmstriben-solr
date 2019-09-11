@@ -26,6 +26,8 @@ pipeline {
 					if(env.BRANCH_NAME == "master") {
 						image.push("latest")
 					}
+					// clean up indexed data to avoid it being used in the next build
+					sh "rm -r data"
 				}
 			}
 		}
