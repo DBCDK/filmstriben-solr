@@ -20,6 +20,7 @@ pipeline {
 					// Run the container like this to be able to run it in the foreground
 					docker.script.sh(script: "docker run --rm -e LOWELL_URL=${LOWELL_URL} --net host ${recommender_image.id} filmstriben-index http://${solr_container.port(8983)}/solr/filmstriben", returnStdout: true).trim()
 					sh "rm -r data"
+					// take data from the temporary solr container to include in the final solr image
 					docker.script.sh(script: "docker cp ${solr_container.id}:/opt/solr/server/solr/filmstriben/data data")
 					image = docker.build("docker-xp.dbc.dk/filmstriben-solr:${DOCKER_TAG}", "--no-cache .")
 					image.push()
