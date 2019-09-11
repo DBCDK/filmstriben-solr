@@ -1,7 +1,9 @@
 #!groovy
 
+workerNode = "devel9"
+
 pipeline {
-	agent {label "devel9"}
+	agent {label workerNode}
 	environment {
 		DOCKER_TAG = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 		GITLAB_PRIVATE_TOKEN = credentials("ai-gitlab-api-token")
@@ -30,6 +32,24 @@ pipeline {
 					// clean up indexed data to avoid it being used in the next build
 					sh "rm -r data"
 				}
+			}
+		}
+		stage("update staging version number") {
+			agent {
+				docker {
+					label workerNode
+					image "docker.dbc.dk/build-env"
+					alwaysPull true
+				}
+			}
+			when {
+				branch "master"
+			}
+			steps {
+				dir("deploy") {
+					sh "set-new-version filmstriben-solr-1-0.yml ${env.GITLAB_PRIVATE_TOKEN} ai/filmstriben-solr-secrets ${env.DOCKER_TAG} -b staging"
+				}
+				build job: "ai/filmstriben-solr-deploy/staging", wait: true
 			}
 		}
 	}
