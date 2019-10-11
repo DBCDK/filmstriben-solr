@@ -31,6 +31,7 @@ pipeline {
 					}
 					// clean up indexed data to avoid it being used in the next build
 					sh "rm -r data"
+					solr_container.stop()
 				}
 			}
 		}
